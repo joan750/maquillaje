@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>blisstic · Bty — Catálogo de Belleza</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<!-- CSS separado -->
+<link rel="stylesheet" href="blisstic_bty.css">
+</head>
+<body>
+
+<div class="overlay-bg" id="listBg" onclick="closeListPanel()"></div>
+
+<!-- LISTA PANEL -->
+<div class="list-panel" id="listPanel">
+  <div class="list-header">
+    <div class="list-header-top">
+      <h2>Mis <span>Listas</span> ✦</h2>
+      <button class="panel-close" onclick="closeListPanel()" aria-label="Cerrar">✕</button>
+    </div>
+    <div class="list-tabs" id="listTabs"></div>
+  </div>
+  <div class="list-items" id="listItems">
+    <div class="list-empty" id="listEmpty">
+      <div style="font-size:40px">🌸</div>
+      <p>Esta lista está vacía</p>
+      <p style="font-size:11px;margin-top:5px;letter-spacing:1px;opacity:.55">Guarda lo que quieres comprar después</p>
+    </div>
+  </div>
+  <div class="list-footer" id="listFooter" style="display:none">
+    <div class="list-items-breakdown" id="listBreakdown"></div>
+    <div class="list-total-row">
+      <span>Total lista</span>
+      <span class="list-total-amt" id="listTotalAmt">$0 MXN</span>
+    </div>
+    <div class="list-actions">
+      <button class="btn-share-list" onclick="shareCurrentList()">✦ Compartir Lista</button>
+      <button class="btn-clear-list" onclick="clearCurrentList()">Vaciar</button>
+    </div>
+  </div>
+</div>
+
+<!-- NEW LIST MODAL -->
+<div class="new-list-overlay" id="newListOverlay">
+  <div class="new-list-box">
+    <h3>Nueva <em>Lista</em></h3>
+    <input class="nl-input" id="nlInput" placeholder="Ej: Looks de verano, Rutina diaria..." maxlength="30" onkeydown="if(event.key==='Enter')confirmNewList()">
+    <div class="nl-btns">
+      <button class="nl-confirm" onclick="confirmNewList()">Crear lista</button>
+      <button class="nl-cancel" onclick="closeNewList()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- PICK LIST -->
+<div class="pick-overlay" id="pickOverlay">
+  <div class="pick-box">
+    <h3>Guardar en lista</h3>
+    <p class="pick-subtitle" id="pickProductName"></p>
+    <div id="pickListOptions"></div>
+    <button class="pick-new-btn" onclick="closePickAndNew()">+ Crear nueva lista</button>
+    <button class="pick-close-btn" onclick="closePick()">Cancelar</button>
+  </div>
+</div>
+
+<!-- DETAIL MODAL -->
+<div class="detail-overlay" id="detailOverlay" onclick="if(event.target===this)closeDetail()">
+  <div class="detail-modal">
+    <div class="detail-visual" id="detailVisual">
+      <button class="d-close" onclick="closeDetail()" aria-label="Cerrar">✕</button>
+      <div class="detail-orb" id="detailOrb"></div>
+    </div>
+    <div class="detail-info">
+      <div class="d-cat" id="dCat"></div>
+      <div class="d-name" id="dName"></div>
+      <div class="d-price" id="dPrice"></div>
+      <div class="d-desc" id="dDesc"></div>
+      <div class="d-features" id="dFeats"></div>
+      <button class="d-add" id="dAddBtn"><span>♡ Guardar en lista</span></button>
+    </div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="logo">
+    <span class="logo-word">blisstic<span class="logo-spark">✦</span></span>
+    <span class="logo-sub">· Bty ·</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#collections">Catálogo</a></li>
+    <li><a href="#tendencias">Tendencias</a></li>
+    <li><a href="#tips">Consejos</a></li>
+    <li><a href="#nosotros">Nosotros</a></li>
+    <li><a href="#pedidos">Contacto</a></li>
+  </ul>
+  <button class="list-btn" onclick="openListPanel()">
+    ♡ Mi Lista <span class="list-count" id="listCount">0</span>
+  </button>
+  <div style="display:flex;align-items:center;gap:10px">
+    <button class="list-btn" id="listBtnMobile" onclick="openListPanel()" style="display:none;padding:8px 14px;font-size:10px;gap:7px">
+      ♡ <span class="list-count" id="listCountMobile" style="width:17px;height:17px;font-size:9px">0</span>
+    </button>
+    <button class="hamburger" id="hamburger" onclick="toggleMobileNav()" aria-label="Menú">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- Mobile Nav Drawer -->
+<div class="mobile-nav" id="mobileNav">
+  <a href="#collections" onclick="closeMobileNav()">Catálogo</a>
+  <a href="#tendencias" onclick="closeMobileNav()">Tendencias</a>
+  <a href="#tips" onclick="closeMobileNav()">Consejos</a>
+  <a href="#nosotros" onclick="closeMobileNav()">Nosotros</a>
+  <a href="#pedidos" onclick="closeMobileNav()">Contacto</a>
+  <button class="list-btn-mobile" onclick="closeMobileNav();openListPanel()">
+    ♡ Mi Lista <span id="listCountDrawer" style="background:rgba(255,255,255,.25);color:#fff;border-radius:50%;width:19px;height:19px;font-size:10px;display:flex;align-items:center;justify-content:center;font-weight:700">0</span>
+  </button>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-left">
+    <div class="hero-content">
+      <div class="hero-tag">Catálogo 2025</div>
+      <h1>Tu belleza, <em>tu lista</em></h1>
+      <p class="hero-sub">Descubre productos de lujo formulados para ti. Guarda lo que amas en listas personales y compártelas cuando quieras.</p>
+      <div class="hero-btns">
+        <button class="btn-primary" onclick="goto('#collections')"><span>Explorar Catálogo</span></button>
+        <button class="btn-outline" onclick="openListPanel()">Ver mis listas</button>
+      </div>
+    </div>
+  </div>
+  <div class="hero-right">
+    <!-- Círculos decorativos con imágenes de maquillaje -->
+    <div class="fp fp1">
+      <img src="https://images.unsplash.com/photo-1586495777744-4e6232bf2177?w=500&h=500&fit=crop&auto=format" alt="Labiales">
+    </div>
+    <div class="fp fp2">
+      <img src="https://images.unsplash.com/photo-1512496015851-a90fb38ba796?w=200&h=200&fit=crop&auto=format" alt="Sombras">
+    </div>
+    <div class="fp fp3">
+      <img src="https://images.unsplash.com/photo-1590439471364-192aa70c0b53?w=120&h=120&fit=crop&auto=format" alt="Bronzer">
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap"><div class="marquee-track" id="marqueeTrack"></div></div>
+
+<!-- COLLECTIONS -->
+<section class="collections" id="collections">
+  <div class="collections-header reveal">
+    <div>
+      <div class="section-label">Colección Signature</div>
+      <h2 class="section-title">Lo que te <em>define</em></h2>
+    </div>
+    <button class="btn-outline" onclick="openCatalog()">Ver Todo →</button>
+  </div>
+  <div class="product-grid" id="productGrid"></div>
+</section>
+
+<!-- TENDENCIAS -->
+<section class="tendencias-section" id="tendencias">
+  <div style="position:relative;z-index:1">
+    <div class="reveal" style="text-align:center">
+      <div class="section-label" style="justify-content:center">Lo que viene</div>
+      <h2 class="section-title" style="text-align:center">Tendencias de <em>Temporada</em></h2>
+    </div>
+    <div class="trend-grid">
+      <div class="trend-card reveal">
+        <div class="trend-sphere" style="width:88px;height:88px;background:radial-gradient(circle at 30% 30%,#eddcff,#c090d8,#6828a8);box-shadow:0 16px 32px rgba(192,144,216,.3)"></div>
+        <div class="trend-tag">Otoño 2025</div>
+        <h3>Rojo <em>Oscuro</em></h3>
+        <p>Labiales en tonos vino, merlot y cereza oscura dominan la temporada.</p>
+      </div>
+      <div class="trend-card reveal reveal-delay-1">
+        <div class="trend-sphere" style="width:88px;height:88px;background:radial-gradient(circle at 30% 30%,#fceef5,#e8a0b4,#c8607a);box-shadow:0 16px 32px rgba(232,160,180,.3)"></div>
+        <div class="trend-tag">Tendencia Global</div>
+        <h3>Gloss <em>Efecto Cristal</em></h3>
+        <p>Acabado espejado que da la ilusión de labios perfectamente hidratados.</p>
+      </div>
+      <div class="trend-card reveal reveal-delay-2">
+        <div class="trend-sphere" style="width:88px;height:88px;background:radial-gradient(circle at 30% 30%,#f8e8d8,#d4a870,#8a5020);box-shadow:0 16px 32px rgba(212,168,112,.28)"></div>
+        <div class="trend-tag">Skincare Tint</div>
+        <h3>Pieles <em>Luminosas</em></h3>
+        <p>Bases con activos que cuidan la piel mientras la cubren naturalmente.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TIPS -->
+<section class="tips-section" id="tips">
+  <div class="reveal" style="text-align:center">
+    <div class="section-label" style="justify-content:center">Aprende</div>
+    <h2 class="section-title">Consejos de <em>Belleza</em></h2>
+  </div>
+  <div class="tips-grid">
+    <div class="tip-card reveal">
+      <div class="tip-number">01</div>
+      <span class="tip-icon">✦</span>
+      <h3>Prepara tu Piel</h3>
+      <p>Hidrata siempre antes de aplicar cualquier base. Una piel bien preparada hace que el maquillaje luzca más natural y dure más tiempo.</p>
+    </div>
+    <div class="tip-card reveal reveal-delay-1">
+      <div class="tip-number">02</div>
+      <span class="tip-icon">🌙</span>
+      <h3>Menos es Más</h3>
+      <p>Empieza con poca cantidad y ve agregando según necesites. Es más fácil agregar que quitar, especialmente con bases y correctores.</p>
+    </div>
+    <div class="tip-card reveal reveal-delay-2">
+      <div class="tip-number">03</div>
+      <span class="tip-icon">💫</span>
+      <h3>Difumina con Amor</h3>
+      <p>La clave de un maquillaje natural está en la difuminación. Invierte en brochas de calidad para lograr acabados profesionales.</p>
+    </div>
+  </div>
+</section>
+
+<!-- NOSOTROS -->
+<section class="brand-section" id="nosotros">
+  <div class="brand-visual reveal">
+    <div class="brand-circle"></div>
+    <div class="brand-circle2"></div>
+  </div>
+  <div class="reveal reveal-delay-1">
+    <div class="section-label">Nuestra historia</div>
+    <h2 class="brand-title">¿Qué nos hace <em>especiales?</em></h2>
+    <p class="brand-desc">blisstic Bty nació con una misión simple: acercar productos de belleza de calidad a quienes los aman. Somos un catálogo curado donde puedes guardar, compartir y soñar con tus próximas compras.</p>
+    <button class="btn-primary" onclick="goto('#collections')"><span>Explorar Catálogo</span></button>
+  </div>
+</section>
+
+<!-- CONTACTO -->
+<section class="pedidos-section" id="pedidos">
+  <div class="pedidos-inner reveal">
+    <div class="section-label">Contacto</div>
+    <h2>Haz tu pedido por <em>Instagram</em></h2>
+    <p class="contact-desc">Visita nuestro perfil, cuéntanos qué productos quieres y te respondemos con disponibilidad, precios y tiempos de entrega.</p>
+    <div class="ig-card">
+      <div class="ig-avatar">
+        <div class="ig-avatar-inner">🌸</div>
+      </div>
+      <div class="ig-info">
+        <div class="ig-handle"><span>@</span>blisstic_bty</div>
+        <div class="ig-tagline">Catálogo de Belleza · Pedidos por DM</div>
+      </div>
+      <div class="ig-steps">
+        <div class="ig-step"><div class="ig-step-num">1</div>Visita nuestro perfil de Instagram</div>
+        <div class="ig-step"><div class="ig-step-num">2</div>Comparte tu lista de deseos en un mensaje directo</div>
+        <div class="ig-step"><div class="ig-step-num">3</div>¡Te respondemos con todo lo que necesitas!</div>
+      </div>
+      <a class="ig-btn" href="https://www.instagram.com/blisstic_bty/" target="_blank" rel="noopener noreferrer">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+        Ir a Instagram
+      </a>
+    </div>
+    <p class="ig-note">También puedes compartir tu lista desde el panel ✦</p>
+  </div>
+</section>
+
+<footer>
+  <p>© 2025 blisstic · Bty — Catálogo de Belleza</p>
+  <div class="social-links">
+    <a href="https://www.instagram.com/blisstic_bty/" target="_blank" rel="noopener noreferrer">Instagram</a>
+    <a href="#">TikTok</a>
+    <a href="#">WhatsApp</a>
+  </div>
+</footer>
+
+<!-- ══ CATÁLOGO COMPLETO ══ -->
+<div class="catalog-overlay" id="catalogOverlay">
+  <div class="cat-header">
+    <button class="cat-back" onclick="closeCatalog()">
+      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      Volver
+    </button>
+    <div class="cat-title">Catálogo <em>Completo</em></div>
+    <div class="cat-count-badge" id="catCountBadge">30 productos</div>
+  </div>
+  <div class="cat-toolbar">
+    <div class="cat-search-row">
+      <input class="cat-search" id="catSearch" placeholder="Buscar producto..." oninput="filterCatalog()">
+      <select class="cat-sort" id="catSort" onchange="filterCatalog()">
+        <option value="default">Destacados</option>
+        <option value="price-asc">Precio: menor a mayor</option>
+        <option value="price-desc">Precio: mayor a menor</option>
+        <option value="name">Nombre A–Z</option>
+      </select>
+    </div>
+    <div class="cat-filters" id="catFilters"></div>
+  </div>
+  <div class="cat-body">
+    <div class="cat-grid" id="catGrid"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><span id="toastMsg"></span></div>
+
+<script>
+/* ════════════════════════════════════════
+   PRODUCTOS — con imágenes reales de maquillaje (Unsplash)
+════════════════════════════════════════ */
+const PRODUCTS=[
+  // ── COLECCIÓN SIGNATURE (hero grid) ──
+  {id:1,name:'Velvet Rouge',cat:'Labial',sub:'Acabado aterciopelado',price:380,big:true,
+   img:'https://images.unsplash.com/photo-1586495777744-4e6232bf2177?w=500&h=500&fit=crop&auto=format',
+   bg:'background:linear-gradient(135deg,#f5dde8,#fceef5)',
+   desc:'Labial de larga duración con fórmula vegana que hidrata mientras tiñe. Pigmentación intensa en un solo trazo con acabado mate aterciopelado.',
+   feats:['Duración 12 horas','Fórmula vegana e hidratante','Alta pigmentación','Sin transfer']},
+
+  {id:2,name:'Moonlit Glow',cat:'Iluminador',sub:'Brillo lunar delicado',price:520,
+   img:'https://images.unsplash.com/photo-1512496015851-a90fb38ba796?w=400&h=400&fit=crop&auto=format',
+   bg:'background:linear-gradient(135deg,#f0e8f8,#fceef5)',
+   desc:'Iluminador en polvo prensado con pigmentos perlados que capturan y reflejan la luz de manera ultra natural.',
+   feats:['Partículas ultrafinas','Apto piel sensible','Larga duración','Acabado satinado']},
+
+  {id:3,name:'Velvet Cocoa',cat:'Sombra',sub:'Paleta de ojos premium',price:680,
+   img:'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=400&h=400&fit=crop&auto=format',
+   bg:'background:linear-gradient(135deg,#f5ede0,#fceef5)',
+   desc:'Paleta de 9 tonos en marrón y nude con alta pigmentación. Perfecta para looks cotidianos y de noche.',
+   feats:['9 tonos degradados','Alta pigmentación','Sin parabenos','Larga duración 10h']},
+
+  {id:4,name:'Cloud Skin',cat:'Base',sub:'Acabado piel perfecta',price:750,
+   img:'https://images.unsplash.com/photo-1571781926291-c477ebfd024b?w=400&h=400&fit=crop&auto=format',
+   bg:'background:linear-gradient(135deg,#fceef5,#f5dde8)',
+   desc:'Suero con base que unifica el tono de piel mientras la hidrata profundamente. Extracto de jade y ácido hialurónico.',
+   feats:['SPF 30 incluido','Extracto de jade','Cobertura media','Apto todo tipo de piel']},
+
+  {id:5,name:'Sunset Bronze',cat:'Bronzer',sub:'Efecto sol natural',price:460,
+   img:'https://images.unsplash.com/photo-1590439471364-192aa70c0b53?w=400&h=400&fit=crop&auto=format',
+   bg:'background:linear-gradient(135deg,#f8f0e0,#fceef5)',
+   desc:'Bronzer con pigmentos cálidos que imitan el bronceado natural del sol. Perfecto para contornear y dar dimensión.',
+   feats:['Tono universal','Micro-partículas','Sin brillitos artificiales','Efecto sol natural']},
+
+  // ── LABIALES ──
+  {id:6,name:'Cherry Bomb',cat:'Labial',sub:'Tono cereza vibrante',price:340,
+   img:'https://images.unsplash.com/photo-1617897903246-719242758050?w=400&h=400&fit=crop&auto=format',
+   bg:'background:linear-gradient(135deg,#ffe8f0,#fceef5)',
+   desc:'Labial cremoso en tono cereza intenso con vitamina E y aceite de argán. Acabado satinado que nutre mientras colorea.',
+   feats:['Fórmula nutritiva','Vitamina E','Acabado satinado','8 horas de duración']},
+
+  {id:7,name:'Rose Petal',cat:'Labial',sub:'Rosa nude perfecto',price:350,
+   img:'https://images.unsplash.com/photo-1604654894610-df63bc536371?w=400&h=400&fit=crop&auto=format',
+   bg:'background:linear-gradient(135deg,#fff0f5,#fceef5)',
+   desc:'El nude rosa perfecto para el tono de piel latinoamericana. Fórmula ultra cómoda con extracto de rosa mosqueta.',
+   feats:['Tono universal','Rosa mosqueta','Muy cómodo','Duración todo el día']},
+
+  {id:8,name:'Wine & Dine',cat:'Labial',sub:'Vino oscuro de lujo',price:390,
+   img:'https://images.unsplash.com/photo-1573461160327-b450edd5c4c0?w=400&h=400&fit=crop&auto=format',
+   bg:'background:linear-gradient(135deg,#f5e0ea,#fceef5)',
+   desc:'Labial en tono vino profundo para looks de noche poderosos. Fórmula larga duración con acabado terciopelo.',
+   feats:['Tono vino intenso','Larga duración 14h','Acabado terciopelo','Sin resecamiento']},
+
+  {id:9,name:'Coral Kiss',cat:'Labial',sub:'Coral tropical vibrante',price:360,
+   img:'https://images.unsplash.com/photo-1598452963314-b09f397a5c48?w=400&h=400&fit=crop&auto=format',
+   bg:'background:linear-gradient(135deg,#fff0e8,#fceef5)',
+   desc:'Coral vibrante que ilumina cualquier tono de piel. Textura ligera con hidratación profunda y color buildable.',
+   feats:['Buildable','Muy hidratante','Coral tropical','Cruelty free']},
+
+  // ── ILUMINADORES ──
+  {id:10,name:'Stardust',cat:'Iluminador',sub:'Polvo estelar dorado',price:490,
+   img:'https://images.unsplash.com/photo-1570194065650-d99fb4b38ab6?w=400&h=400&fit=crop&auto=format',
+   bg:'background:linear-gradient(135deg,#fff8e0,#fceef5)',
+   desc:'Polvo iluminador en tono dorado champagne. Micro-partículas que se adhieren perfectamente y no se ven brillosas.',
+   feats:['Micro-partículas','Tono dorado','Larga duración','Apto todo tipo de piel']},
+
+  {id:11,name:'Pearl Drop',cat:'Iluminador',sub:'Perla líquida cremosa',price:560,
+   img:'https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=400&h=400&fit=crop&auto=format',
+   bg:'background:linear-gradient(135deg,#f5f0ff,#fceef5)',
+   desc:'Iluminador líquido de textura cremosa que se mezcla con la base o se usa solo para un glow húmedo irresistible.',
+   feats:['Textura líquida','Glow húmedo','Multifuncional','Apto piel seca']},
+
+  {id:12,name:'Rose Gold',cat:'Iluminador',sub:'Oro rosa sofisticado',price:530,
+   img:'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=400&h=400&fit=crop&auto=format',
+   bg:'background:linear-gradient(135deg,#fff0f5,#fceef5)',
+   desc:'Iluminador en tono oro rosa que complementa pieles morenas y claras por igual. Acabado luminoso y sofisticado.',
+   feats:['Oro rosa','Universal','Acabado luminoso','Sin parabenos']},
+
+  // ── SOMBRAS ──
+  {id:13,name:'Smoky Drama',cat:'Sombra',sub:'Paleta ahumada intensa',price:720,
+   img:'https://images.unsplash.com/photo-1519763152927-2e1d040ae4ba?w=400&h=400&fit=crop&auto=format',
+   bg:'background:linear-gradient(135deg,#e8e8f0,#fceef5)',
+   desc:'Paleta de 12 tonos en grises, negros y plateados para crear el smoky eye perfecto. Pigmentación extrema.',
+   feats:['12 tonos','Pigmentación extrema','Fácil de difuminar','Larga duración 12h']},
+
+  {id:14,name:'Pink Fantasy',cat:'Sombra',sub:'Tonos rosas soñadores',price:640,
+   img:'https://images.unsplash.com/photo-1547887537-6158d64c35b3?w=400&h=400&fit=crop&auto=format',
+   bg:'background:linear-gradient(135deg,#ffe8f5,#fceef5)',
+   desc:'8 tonos en rosas y lilas para looks románticos y fantásticos. Incluye acabados mate, satinado y glitter.',
+   feats:['8 tonos mixtos','Mate + satinado + glitter','Sin parabenos','Alta pigmentación']},
+
+  {id:15,name:'Earth Goddess',cat:'Sombra',sub:'Tierras y terracota',price:660,
+   img:'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=400&h=400&fit=crop&auto=format',
+   bg:'background:linear-gradient(135deg,#f8ede0,#fceef5)',
+   desc:'Paleta de 10 tonos en tierra, terracota y bronce. Perfecta para looks cotidianos naturales y de día.',
+   feats:['10 tonos tierra','Formulación vegana','Larga duración','Fácil blending']},
+
+  // ── BASES ──
+  {id:16,name:'Blur Effect',cat:'Base',sub:'Acabado airbrushed',price:820,
+   img:'https://images.unsplash.com/photo-1583241475880-083f84372725?w=400&h=400&fit=crop&auto=format',
+   bg:'background:linear-gradient(135deg,#f5eef8,#fceef5)',
+   desc:'Base con efecto blur que difumina poros y líneas finas. Cobertura completa buildable con acabado piel de porcelana.',
+   feats:['Efecto blur','Cobertura completa','Difumina poros','SPF 15']},
+
+  {id:17,name:'Serum Glow',cat:'Base',sub:'Base sérum luminosa',price:780,
+   img:'https://images.unsplash.com/photo-1609587312208-cea54be969e7?w=400&h=400&fit=crop&auto=format',
+   bg:'background:linear-gradient(135deg,#fff5e0,#fceef5)',
+   desc:'Base-sérum con ácido hialurónico y vitamina C. Cobertura media con acabado glow natural que cuida la piel.',
+   feats:['Ácido hialurónico','Vitamina C','Glow natural','Cobertura media']},
+
+  {id:18,name:'Matte Velvet',cat:'Base',sub:'Mate perfecto sin brillo',price:760,
+   img:'https://images.unsplash.com/photo-1571781926291-c477ebfd024b?w=400&h=400&fit=crop&auto=format',
+   bg:'background:linear-gradient(135deg,#f2eaf8,#fceef5)',
+   desc:'Base de larga duración con control de brillo durante 24 horas. Ideal para pieles mixtas y grasas.',
+   feats:['Control brillo 24h','Piel mixta/grasa','Cobertura full','Sin comedogénico']},
+
+  // ── BLUSH ──
+  {id:19,name:'Peach Fuzz',cat:'Blush',sub:'Durazno suave natural',price:420,
+   img:'https://images.unsplash.com/photo-1590439471364-192aa70c0b53?w=400&h=400&fit=crop&auto=format',
+   bg:'background:linear-gradient(135deg,#fff0e8,#fceef5)',
+   desc:'Rubor en polvo tono durazno cálido que da un flush de color natural. Fórmula buildable de larga duración.',
+   feats:['Tono durazno','Buildable','Larga duración','Apto piel sensible']},
+
+  {id:20,name:'Berry Blush',cat:'Blush',sub:'Baya intensa y vibrante',price:440,
+   img:'https://images.unsplash.com/photo-1570194065650-d99fb4b38ab6?w=400&h=400&fit=crop&auto=format',
+   bg:'background:linear-gradient(135deg,#fde8f8,#fceef5)',
+   desc:'Rubor en tono baya intenso para un flush dramático y romántico. Pigmentación buildable perfecta.',
+   feats:['Alta pigmentación','Buildable','Tono baya','Larga duración']},
+
+  {id:21,name:'Nude Flush',cat:'Blush',sub:'Rubor nude universal',price:400,
+   img:'https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=400&h=400&fit=crop&auto=format',
+   bg:'background:linear-gradient(135deg,#f8f0ec,#fceef5)',
+   desc:'Rubor nude universal que se adapta a cualquier tono de piel dando un color saludable y natural.',
+   feats:['Universal','Muy natural','Sin parabenos','Buildable']},
+
+  // ── CEJAS ──
+  {id:22,name:'Brow Definer',cat:'Cejas',sub:'Lápiz de cejas preciso',price:280,
+   img:'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=400&h=400&fit=crop&auto=format',
+   bg:'background:linear-gradient(135deg,#f0e8e0,#fceef5)',
+   desc:'Lápiz retráctil ultrafino para definir cejas con trazos similares al cabello natural. Resistente al agua.',
+   feats:['Resistente al agua','Punta ultrafina','Efecto pelo a pelo','Larga duración']},
+
+  {id:23,name:'Arch Pomade',cat:'Cejas',sub:'Pomada de cejas full',price:320,
+   img:'https://images.unsplash.com/photo-1512496015851-a90fb38ba796?w=400&h=400&fit=crop&auto=format',
+   bg:'background:linear-gradient(135deg,#ece0d8,#fceef5)',
+   desc:'Pomada de cejas de alta pigmentación para cejas bold y definidas. Fórmula waterproof de larga duración.',
+   feats:['Waterproof','Alta pigmentación','Bold look','24 horas']},
+
+  // ── GLOSS ──
+  {id:24,name:'Glass Gloss',cat:'Gloss',sub:'Volumen espejo brillante',price:290,
+   img:'https://images.unsplash.com/photo-1604654894610-df63bc536371?w=400&h=400&fit=crop&auto=format',
+   bg:'background:linear-gradient(135deg,#fff5f8,#fceef5)',
+   desc:'Gloss efecto espejo que da volumen y humectación extrema. Textura cómoda sin sensación pegajosa.',
+   feats:['Efecto espejo','Sin pegajosidad','Hidratación extrema','Buildable']},
+
+  {id:25,name:'Juicy Plum',cat:'Gloss',sub:'Ciruela jugosa irresistible',price:270,
+   img:'https://images.unsplash.com/photo-1617897903246-719242758050?w=400&h=400&fit=crop&auto=format',
+   bg:'background:linear-gradient(135deg,#f5e0f8,#fceef5)',
+   desc:'Gloss en tono ciruela con efecto plumping que da apariencia de labios más llenos de manera natural.',
+   feats:['Efecto plumping','Tono ciruela','Sin parabenos','Con ácido hialurónico']},
+
+  // ── DELINEADOR ──
+  {id:26,name:'Precision Wing',cat:'Delineador',sub:'Delineador ala perfecta',price:310,
+   img:'https://images.unsplash.com/photo-1583241475880-083f84372725?w=400&h=400&fit=crop&auto=format',
+   bg:'background:linear-gradient(135deg,#e8e8f5,#fceef5)',
+   desc:'Delineador de punta fina con tinta de larga duración. Trazo preciso y resistente al agua para el ala perfecta.',
+   feats:['Punta ultrafina','Waterproof','Negro intenso','Larga duración 24h']},
+
+  {id:27,name:'Kohl Drama',cat:'Delineador',sub:'Kajal ahumado intenso',price:260,
+   img:'https://images.unsplash.com/photo-1519763152927-2e1d040ae4ba?w=400&h=400&fit=crop&auto=format',
+   bg:'background:linear-gradient(135deg,#e0e0e8,#fceef5)',
+   desc:'Kajal cremoso ultra pigmentado para líneas ahumadas en segundos. Fácil de difuminar, difícil de borrar.',
+   feats:['Ultra pigmentado','Fácil de difuminar','Muy cremoso','Waterproof']},
+
+  // ── FIJADOR ──
+  {id:28,name:'Fix & Last',cat:'Fijador',sub:'Setting spray 24 horas',price:380,
+   img:'https://images.unsplash.com/photo-1609587312208-cea54be969e7?w=400&h=400&fit=crop&auto=format',
+   bg:'background:linear-gradient(135deg,#eef8f4,#fceef5)',
+   desc:'Spray fijador que extiende la duración del maquillaje hasta 24 horas resistiendo humedad, calor y sudor.',
+   feats:['24 horas','Resistente al calor','Efecto refrescante','Sin alcohol']},
+
+  {id:29,name:'Hydra Mist',cat:'Fijador',sub:'Niebla hidratante y fijadora',price:350,
+   img:'https://images.unsplash.com/photo-1571781926291-c477ebfd024b?w=400&h=400&fit=crop&auto=format',
+   bg:'background:linear-gradient(135deg,#e8f5fa,#fceef5)',
+   desc:'Niebla fijadora con agua de rosas y ácido hialurónico. Fija, hidrata y da luminosidad en un solo paso.',
+   feats:['Agua de rosas','Ácido hialurónico','Fija + hidrata','Sensación refrescante']},
+
+  // ── CORRECTOR ──
+  {id:30,name:'Glow Corrector',cat:'Corrector',sub:'Corrector iluminador',price:430,
+   img:'https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=400&h=400&fit=crop&auto=format',
+   bg:'background:linear-gradient(135deg,#fff8e0,#fceef5)',
+   desc:'Corrector de cobertura media-alta con finish luminoso. Cubre ojeras y manchas dejando el área de ojos rejuvenecida.',
+   feats:['Cobertura alta','Finish luminoso','Hidratante','Larga duración']},
+];
+
+/* ─── Estado ─── */
+let lists=[{id:1,name:'Mi Lista',items:[]}];
+let activeListId=1,nextListId=2,pendingProductId=null;
+
+const listEmptyEl=document.getElementById('listEmpty');
+const getActiveList=()=>lists.find(l=>l.id===activeListId);
+const totalItems=()=>lists.reduce((s,l)=>s+l.items.length,0);
+
+/* ─── Panel ─── */
+function openListPanel(){
+  document.getElementById('listBg').classList.add('open');
+  document.getElementById('listPanel').classList.add('open');
+  renderTabs();
+  renderListItems();
+}
+function closeListPanel(){
+  document.getElementById('listBg').classList.remove('open');
+  document.getElementById('listPanel').classList.remove('open');
+}
+
+/* ─── Tabs ─── */
+function renderTabs(){
+  document.getElementById('listTabs').innerHTML=
+    lists.map(l=>`<button class="list-tab${l.id===activeListId?' active':''}" onclick="switchList(${l.id})">${l.name} (${l.items.length})</button>`).join('')+
+    `<button class="tab-add" onclick="openNewList()">+</button>`;
+}
+function switchList(id){activeListId=id;renderTabs();renderListItems();}
+
+/* ─── Render items con IMÁGENES ─── */
+function renderListItems(){
+  const list=getActiveList();
+  const box=document.getElementById('listItems');
+  const footer=document.getElementById('listFooter');
+
+  if(!list||!list.items.length){
+    box.innerHTML='';
+    box.appendChild(listEmptyEl);
+    listEmptyEl.style.display='block';
+    footer.style.display='none';
+    return;
+  }
+
+  listEmptyEl.style.display='none';
+  footer.style.display='block';
+
+  /* Usa imagen real en lugar del orb de color */
+  box.innerHTML=list.items.map(x=>`
+    <div class="list-item">
+      <img src="${x.img}" class="list-item-img" alt="${x.name}" loading="lazy">
+      <div class="list-item-info">
+        <div class="list-item-name">${x.name}</div>
+        <div class="list-item-cat">${x.cat}</div>
+        <div class="list-item-price-each">$${x.price.toLocaleString()} MXN</div>
+      </div>
+      <div class="item-right">
+        <button class="item-remove" onclick="removeFromList(${x.id})">✕ quitar</button>
+      </div>
+    </div>`).join('');
+
+  document.getElementById('listBreakdown').innerHTML=
+    list.items.map(x=>`<div class="breakdown-row"><span>${x.name}</span><span>$${x.price.toLocaleString()} MXN</span></div>`).join('');
+  document.getElementById('listTotalAmt').textContent=
+    `$${list.items.reduce((s,x)=>s+x.price,0).toLocaleString()} MXN`;
+}
+
+/* ─── Agregar ─── */
+function saveProduct(productId){
+  if(lists.length===1) addToList(productId,lists[0].id);
+  else{pendingProductId=productId;openPick(productId);}
+}
+function addToList(productId,listId){
+  const p=PRODUCTS.find(x=>x.id===productId),list=lists.find(l=>l.id===listId);
+  if(!p||!list)return;
+  if(list.items.find(x=>x.id===productId)){toast(`"${p.name}" ya está en "${list.name}" 💜`);return;}
+  list.items.push({...p});
+  updateCount();
+  markSaved(productId);
+  toast(`"${p.name}" guardado en "${list.name}" ✦`);
+  const c=document.getElementById('listCount');
+  c.classList.add('bump');
+  setTimeout(()=>c.classList.remove('bump'),400);
+}
+
+/* ─── Quitar ─── */
+function removeFromList(productId){
+  const list=getActiveList();
+  if(!list)return;
+  list.items=list.items.filter(x=>x.id!==productId);
+  updateCount();
+  renderListItems();
+  renderTabs();
+  updateAllSavedMarkers();
+}
+
+/* ─── Vaciar ─── */
+function clearCurrentList(){
+  const list=getActiveList();
+  if(!list)return;
+  list.items=[];
+  updateCount();
+  renderListItems();
+  renderTabs();
+  updateAllSavedMarkers();
+}
+
+/* ─── Contadores ─── */
+function updateCount(){
+  const n=totalItems();
+  ['listCount','listCountMobile','listCountDrawer'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el)el.textContent=n;
+  });
+}
+
+/* ─── Marcadores saved ─── */
+function markSaved(productId){
+  document.querySelectorAll(`.saved-badge[data-id="${productId}"]`).forEach(b=>b.classList.add('show'));
+  document.querySelectorAll(`.product-save[data-id="${productId}"]`).forEach(b=>{b.textContent='♥';b.classList.add('saved');});
+}
+function updateAllSavedMarkers(){
+  PRODUCTS.forEach(p=>{
+    const saved=lists.some(l=>l.items.find(x=>x.id===p.id));
+    document.querySelectorAll(`.saved-badge[data-id="${p.id}"]`).forEach(b=>{saved?b.classList.add('show'):b.classList.remove('show');});
+    document.querySelectorAll(`.product-save[data-id="${p.id}"]`).forEach(b=>{
+      if(saved){b.textContent='♥';b.classList.add('saved');}
+      else{b.textContent='♡';b.classList.remove('saved');}
+    });
+  });
+}
+
+/* ─── Compartir lista ─── */
+function shareCurrentList(){
+  const list=getActiveList();
+  if(!list||!list.items.length){toast('La lista está vacía 🌸');return;}
+  const text=`✦ Mi Lista de Deseos blisstic Bty — "${list.name}"\n\n`+
+    list.items.map((x,i)=>`${i+1}. ${x.name} (${x.cat}) — $${x.price.toLocaleString()} MXN`).join('\n')+
+    `\n\nTotal: $${list.items.reduce((s,x)=>s+x.price,0).toLocaleString()} MXN\n\nPedidos: @blisstic_bty en Instagram`;
+  if(navigator.share){navigator.share({title:'Mi Lista blisstic Bty',text});}
+  else if(navigator.clipboard){navigator.clipboard.writeText(text).then(()=>toast('Lista copiada al portapapeles ✦'));}
+  else toast('Comparte tu lista en @blisstic_bty 💌');
+}
+
+/* ─── Nueva lista ─── */
+function openNewList(){document.getElementById('newListOverlay').classList.add('open');setTimeout(()=>document.getElementById('nlInput').focus(),200);}
+function closeNewList(){document.getElementById('newListOverlay').classList.remove('open');document.getElementById('nlInput').value='';}
+function confirmNewList(){
+  const name=document.getElementById('nlInput').value.trim();
+  if(!name){toast('Escribe un nombre ⚠️');return;}
+  const nl={id:nextListId++,name,items:[]};
+  lists.push(nl);
+  activeListId=nl.id;
+  closeNewList();
+  renderTabs();
+  renderListItems();
+  toast(`Lista "${name}" creada ✦`);
+}
+
+/* ─── Pick list ─── */
+function openPick(id){
+  const p=PRODUCTS.find(x=>x.id===id);
+  document.getElementById('pickProductName').textContent=p?`"${p.name}"`:'';
+  document.getElementById('pickListOptions').innerHTML=lists.map(l=>`
+    <div class="pick-list-item" onclick="pickList(${l.id})">
+      <span class="pick-list-name">${l.name}</span>
+      <span class="pick-list-count">${l.items.length} productos</span>
+    </div>`).join('');
+  document.getElementById('pickOverlay').classList.add('open');
+}
+function closePick(){document.getElementById('pickOverlay').classList.remove('open');pendingProductId=null;}
+function closePickAndNew(){closePick();openNewList();}
+function pickList(listId){
+  if(pendingProductId!==null){addToList(pendingProductId,listId);activeListId=listId;}
+  closePick();
+}
+
+/* ─── Detalle — usa imagen real ─── */
+function openDetail(id){
+  const p=PRODUCTS.find(x=>x.id===id);
+  if(!p)return;
+  document.getElementById('dCat').textContent=p.cat;
+  document.getElementById('dName').textContent=p.name;
+  document.getElementById('dPrice').textContent=`$${p.price.toLocaleString()} MXN`;
+  document.getElementById('dDesc').textContent=p.desc;
+
+  /* Imagen real en el modal de detalle */
+  const orbEl=document.getElementById('detailOrb');
+  orbEl.style.cssText='';
+  orbEl.innerHTML=`<img src="${p.img}" class="detail-product-img" alt="${p.name}" loading="lazy">`;
+
+  const vis=document.getElementById('detailVisual');
+  vis.style.cssText=`position:relative;min-height:220px;display:flex;align-items:center;justify-content:center;overflow:hidden;${p.bg}`;
+  document.getElementById('dFeats').innerHTML=p.feats.map(f=>`<div class="d-feat">${f}</div>`).join('');
+  document.getElementById('dAddBtn').onclick=()=>{closeDetail();saveProduct(id);};
+  document.getElementById('detailOverlay').classList.add('open');
+}
+function closeDetail(){document.getElementById('detailOverlay').classList.remove('open');}
+
+/* ─── Render productos — usa imagen real ─── */
+function renderProducts(){
+  document.getElementById('productGrid').innerHTML=PRODUCTS.map((p,i)=>`
+    <div class="product-card${p.big?' big':''} reveal${i?' reveal-delay-'+Math.min(i,3):''}" onclick="openDetail(${p.id})">
+      <div class="product-bg" style="${p.bg}">
+        <img src="${p.img}" class="product-img" alt="${p.name}" loading="lazy">
+      </div>
+      <div class="product-overlay">
+        <div class="product-category">${p.cat}</div>
+        <div class="product-name">${p.name}</div>
+        <div class="product-sub">${p.sub}</div>
+        <div class="product-price">$${p.price.toLocaleString()} MXN</div>
+      </div>
+      <div class="saved-badge" data-id="${p.id}">♥ Guardado</div>
+      <div class="view-hint">Ver detalles →</div>
+      <button class="product-save" data-id="${p.id}" onclick="event.stopPropagation();saveProduct(${p.id})" aria-label="Guardar en lista">♡</button>
+    </div>`).join('');
+}
+
+/* ─── Marquee ─── */
+function renderMarquee(){
+  const items=['Catálogo de Lujo','Cruelty Free','Pigmentos Premium','Fórmulas Innovadoras','Arte en tu Piel','Belleza sin límites','Guarda tu wishlist'];
+  const t=document.getElementById('marqueeTrack');
+  let h='';
+  for(let i=0;i<3;i++)items.forEach(x=>{h+=`<span class="marquee-item">${x}</span><span class="marquee-dot">✦</span>`;});
+  t.innerHTML=h+h;
+}
+
+/* ─── Toast ─── */
+let toastT;
+function toast(msg){
+  document.getElementById('toastMsg').textContent=msg;
+  const el=document.getElementById('toast');
+  el.classList.add('show');
+  clearTimeout(toastT);
+  toastT=setTimeout(()=>el.classList.remove('show'),3000);
+}
+
+/* ─── Menú móvil ─── */
+function toggleMobileNav(){
+  document.getElementById('hamburger').classList.toggle('open');
+  document.getElementById('mobileNav').classList.toggle('open');
+}
+function closeMobileNav(){
+  document.getElementById('hamburger').classList.remove('open');
+  document.getElementById('mobileNav').classList.remove('open');
+}
+
+/* ─── Botón lista móvil ─── */
+function updateMobileListBtn(){
+  const btn=document.getElementById('listBtnMobile');
+  if(window.innerWidth<=768)btn.style.display='flex';
+  else btn.style.display='none';
+}
+window.addEventListener('resize',updateMobileListBtn);
+updateMobileListBtn();
+
+/* ─── Reveal on scroll ─── */
+const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');});},{threshold:.1});
+function activateReveal(){document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));}
+
+/* ─── Parallax hero ─── */
+window.addEventListener('scroll',()=>{
+  const r=document.querySelector('.hero-right');
+  if(r)r.style.transform=`translateY(${window.scrollY*.08}px)`;
+});
+
+/* ─── Navegación suave ─── */
+function goto(s){document.querySelector(s)?.scrollIntoView({behavior:'smooth'});}
+
+/* ─── Cerrar modals con ESC ─── */
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){
+    closeCatalog();closeDetail();closePick();closeNewList();closeListPanel();closeMobileNav();
+  }
+});
+
+/* ─── Catálogo completo ─── */
+const ALL_CATS=['Todos','Labial','Iluminador','Sombra','Base','Bronzer','Blush','Cejas','Gloss','Delineador','Fijador','Corrector'];
+let activeCat='Todos';
+
+function openCatalog(){
+  document.getElementById('catalogOverlay').classList.add('open');
+  document.body.style.overflow='hidden';
+  renderCatFilters();
+  filterCatalog();
+}
+function closeCatalog(){
+  document.getElementById('catalogOverlay').classList.remove('open');
+  document.body.style.overflow='';
+}
+function renderCatFilters(){
+  document.getElementById('catFilters').innerHTML=ALL_CATS.map(c=>
+    `<button class="filter-chip${c===activeCat?' active':''}" onclick="setCatFilter('${c}')">${c}</button>`
+  ).join('');
+}
+function setCatFilter(cat){activeCat=cat;renderCatFilters();filterCatalog();}
+
+/* ─── Filtrar catálogo — usa imagen real ─── */
+function filterCatalog(){
+  const q=document.getElementById('catSearch').value.toLowerCase().trim();
+  const sort=document.getElementById('catSort').value;
+  let items=[...PRODUCTS];
+  if(activeCat!=='Todos') items=items.filter(p=>p.cat===activeCat);
+  if(q) items=items.filter(p=>
+    p.name.toLowerCase().includes(q)||p.cat.toLowerCase().includes(q)||p.sub.toLowerCase().includes(q));
+  if(sort==='price-asc') items.sort((a,b)=>a.price-b.price);
+  else if(sort==='price-desc') items.sort((a,b)=>b.price-a.price);
+  else if(sort==='name') items.sort((a,b)=>a.name.localeCompare(b.name));
+  document.getElementById('catCountBadge').textContent=`${items.length} producto${items.length!==1?'s':''}`;
+  const grid=document.getElementById('catGrid');
+  if(!items.length){
+    grid.innerHTML=`<div class="cat-empty"><div style="font-size:40px">🌸</div><p>No encontramos productos con esa búsqueda</p></div>`;
+    return;
+  }
+  grid.innerHTML=items.map(p=>{
+    const saved=lists.some(l=>l.items.find(x=>x.id===p.id));
+    return `<div class="cat-card" onclick="openDetail(${p.id})">
+      <div class="cat-card-visual" style="${p.bg}">
+        <img src="${p.img}" class="cat-product-img" alt="${p.name}" loading="lazy">
+        <div class="cat-saved-badge${saved?' show':''}" data-cat-id="${p.id}">♥ Guardado</div>
+      </div>
+      <div class="cat-card-body">
+        <div class="cat-card-cat">${p.cat}</div>
+        <div class="cat-card-name">${p.name}</div>
+        <div class="cat-card-sub">${p.sub}</div>
+        <div class="cat-card-footer">
+          <div class="cat-card-price">$${p.price.toLocaleString()} MXN</div>
+          <button class="cat-card-save${saved?' saved':''}" data-cat-save-id="${p.id}"
+            onclick="event.stopPropagation();saveProductFromCatalog(${p.id})" aria-label="Guardar">${saved?'♥':'♡'}</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function saveProductFromCatalog(id){
+  saveProduct(id);
+  setTimeout(()=>updateCatSavedMarkers(),50);
+}
+function updateCatSavedMarkers(){
+  PRODUCTS.forEach(p=>{
+    const saved=lists.some(l=>l.items.find(x=>x.id===p.id));
+    document.querySelectorAll(`[data-cat-id="${p.id}"]`).forEach(b=>{
+      saved?b.classList.add('show'):b.classList.remove('show');
+    });
+    document.querySelectorAll(`[data-cat-save-id="${p.id}"]`).forEach(btn=>{
+      if(saved){btn.textContent='♥';btn.classList.add('saved');}
+      else{btn.textContent='♡';btn.classList.remove('saved');}
+    });
+  });
+}
+
+/* Parches addToList/removeFromList para sincronizar catálogo */
+const _origAddToList=addToList;
+function addToList(productId,listId){
+  _origAddToList(productId,listId);
+  updateCatSavedMarkers();
+}
+const _origRemoveFromList=removeFromList;
+function removeFromList(productId){
+  _origRemoveFromList(productId);
+  updateCatSavedMarkers();
+}
+const _origClearCurrentList=clearCurrentList;
+function clearCurrentList(){
+  _origClearCurrentList();
+  updateCatSavedMarkers();
+}
+
+/* ─── Init ─── */
+renderProducts();
+renderMarquee();
+setTimeout(activateReveal,80);
+</script>
+</body>
+</html>
